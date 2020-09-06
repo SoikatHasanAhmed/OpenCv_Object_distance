@@ -1,8 +1,13 @@
 import time
 import urllib.request
 from methods import *
+import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--webcam', type=bool, default=True)
+parser.add_argument('--url', type=str, default='http://192.168.0.4:8080/shot.jpg')
 
+args = parser.parse_args()
 #here we put the object 30 cm from the camera to calibraing
 KNOWN_DISTANCE = 30.0
 
@@ -10,13 +15,18 @@ KNOWN_DISTANCE = 30.0
 KNOWN_WIDTH = 3.0
 #we use a ip webcam for capture video
 
-url = 'http://192.168.0.4:8080/shot.jpg'
+url = args.url
 print("<<<---- taking calibrating Image ---->>>")
 time.sleep(2)
+if args.webcam:
+    cap =  cv2.VideoCapture(0)
+    _,c_image = cap.read()
 
-imgResp = urllib.request.urlopen(url)
-imgNp = np.array(bytearray(imgResp.read()), dtype=np.uint8)
-c_image = cv2.imdecode(imgNp, -1)
+
+else:
+    imgResp = urllib.request.urlopen(url)
+    imgNp = np.array(bytearray(imgResp.read()), dtype=np.uint8)
+    c_image = cv2.imdecode(imgNp, -1)
 
 
 
@@ -29,10 +39,12 @@ time.sleep(2)
 print("<<<---- Main program Staring ---->>>")
 
 while True:
-
-    imgResp = urllib.request.urlopen(url)
-    imgNp = np.array(bytearray(imgResp.read()), dtype=np.uint8)
-    image = cv2.imdecode(imgNp, -1)
+    if args.webcam:
+        _,image = cap.read()
+    else:
+        imgResp = urllib.request.urlopen(url)
+        image = np.array(bytearray(imgResp.read()), dtype=np.uint8)
+    # image = cv2.imdecode(imgNp, -1)
 
 
 
